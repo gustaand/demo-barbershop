@@ -55,8 +55,8 @@ export function seedDemoData(): DemoData {
     version: 2,
     business: {
       name: 'MW BarberShop',
-      phone: '+34 931 234 567',
-      whatsapp: '34612345678',
+      phone: '+34 603 976 985',
+      whatsapp: '+34 603 976 985',
       email: 'hola@mwbarbershop.es',
       address: 'Carrer de la Indústria, 42 · Barcelona',
       description: 'Barbería contemporánea, trato cercano y técnica cuidada. Tu estilo, siempre a punto.',
