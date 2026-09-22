@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#0b0a09" />
+    <meta name="description" content="Demo funcional de reservas para barberías de Marques Works" />
+    <title>MW BarberShop · Demo Marques Works</title>
+    <script>
+      (() => {
+        try {
+          const raw = localStorage.getItem('mw-demo-v1');
+          const theme = raw ? JSON.parse(raw)?.settings?.theme : 'system';
+          const dark = theme === 'dark' || (theme === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);
+          document.documentElement.dataset.panelTheme = dark ? 'dark' : 'light';
+        } catch { /* The app will apply the default theme. */ }
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
