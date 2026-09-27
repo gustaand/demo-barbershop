@@ -9,7 +9,7 @@ function escape(value: string) {
   return value.replaceAll('\\', '\\\\').replaceAll(',', '\\,').replaceAll(';', '\\;').replaceAll('\n', '\\n');
 }
 
-export function downloadAppointmentIcs(data: DemoData, appointment: Appointment) {
+export function downloadAppointmentIcs(data: DemoData, appointment: Appointment, businessName: string) {
   const service = data.services.find((item) => item.id === appointment.serviceId);
   const staff = data.staff.find((item) => item.id === appointment.staffId);
   const start = fromDateKey(appointment.date, appointment.time);
@@ -17,14 +17,14 @@ export function downloadAppointmentIcs(data: DemoData, appointment: Appointment)
   const content = [
     'BEGIN:VCALENDAR',
     'VERSION:2.0',
-    'PRODID:-//Marques Works//MW BarberShop Demo//ES',
+    'PRODID:-//Marques Works//Demo Reservas//ES',
     'CALSCALE:GREGORIAN',
     'BEGIN:VEVENT',
-    `UID:${appointment.id}@mwbarbershop.demo`,
+    `UID:${appointment.id}@marquesworks.demo`,
     `DTSTAMP:${icsDate(new Date())}`,
     `DTSTART:${icsDate(start)}`,
     `DTEND:${icsDate(end)}`,
-    `SUMMARY:${escape(`${service?.name ?? 'Cita'} · ${data.business.name}`)}`,
+    `SUMMARY:${escape(`${service?.name ?? 'Cita'} · ${businessName}`)}`,
     `DESCRIPTION:${escape(`Profesional: ${staff?.name ?? ''}. Reserva a nombre de ${appointment.customerName}.`)}`,
     `LOCATION:${escape(data.business.address)}`,
     'END:VEVENT',

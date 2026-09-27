@@ -3,6 +3,7 @@ import { CalendarRange, ChevronRight, Clock3, GalleryHorizontal, Home, LogOut, M
 import type { Plan } from '../../types';
 import type { PanelScreen } from './panelTypes';
 import { screenTitles } from './panelTypes';
+import { useDemo } from '../../store/DemoContext';
 
 const mainItems: { screen: PanelScreen; label: string; icon: typeof Home }[] = [
   { screen: 'dashboard', label: 'Hoy', icon: Home },
@@ -27,16 +28,19 @@ export function PanelShell({ plan, screen, onScreen, onLogout, children }: {
   onLogout: () => void;
   children: ReactNode;
 }) {
+  const { demoId, config, appearance } = useDemo();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const select = (next: PanelScreen) => { onScreen(next); setDrawerOpen(false); window.scrollTo({ top: 0, behavior: 'smooth' }); };
 
+  const labelFor = (item: (typeof mainItems)[number] | (typeof moreItems)[number]) => item.screen === 'team' ? config.labels.teamTitle : item.label;
+
   const NavButton = ({ item }: { item: (typeof mainItems)[number] }) => {
     const Icon = item.icon;
-    return <button className={screen === item.screen ? 'active' : ''} type="button" onClick={() => select(item.screen)}><Icon size={19} /><span>{item.label}</span></button>;
+    return <button className={screen === item.screen ? 'active' : ''} type="button" onClick={() => select(item.screen)}><Icon size={19} /><span>{labelFor(item)}</span></button>;
   };
 
   return (
-    <div className="panel-app">
+    <div className={`panel-app ${demoId === 'belleza' ? 'panel-minimal-beauty' : ''}`} data-panel-variant={demoId === 'belleza' ? 'minimalBeauty' : 'classic'}>
       <aside className="panel-sidebar">
         <div className="panel-brand"><span><img src="/images/marques-works-logo-gold.png" alt="" /></span><div><strong>Marques Works</strong><small>Panel de reservas</small></div></div>
         <div className={`plan-chip ${plan}`}><b>Plan {plan === 'managed' ? 'Managed' : 'Essential'}</b><span>{plan === 'managed' ? 'Gestión autónoma' : 'Gestión asistida'}</span></div>
@@ -51,8 +55,8 @@ export function PanelShell({ plan, screen, onScreen, onLogout, children }: {
 
       <div className="panel-main">
         <header className="panel-topbar">
-          <div><span className="topbar-eyebrow">MW BarberShop</span><h1>{screenTitles[screen]}</h1></div>
-          <div className="topbar-actions"><a className="button subtle small" href="/demo" target="_blank" rel="noreferrer">Ver web</a><button className="avatar-button" type="button" onClick={() => select('settings')} aria-label="Abrir configuración"><img src="/images/marques-works-logo-gold.png" alt="" /></button></div>
+          <div><span className="topbar-eyebrow">{appearance.businessName}</span><h1>{screen === 'team' ? config.labels.teamTitle : screenTitles[screen]}</h1></div>
+          <div className="topbar-actions"><a className="button subtle small" href={`/demo/${demoId}`} target="_blank" rel="noreferrer">Ver web</a><button className="avatar-button" type="button" onClick={() => select('settings')} aria-label="Abrir configuración"><img src="/images/marques-works-logo-gold.png" alt="" /></button></div>
         </header>
         <div className="panel-content">{children}</div>
       </div>
@@ -65,7 +69,7 @@ export function PanelShell({ plan, screen, onScreen, onLogout, children }: {
       {drawerOpen && <div className="drawer-scrim" onMouseDown={(event) => event.target === event.currentTarget && setDrawerOpen(false)}>
         <aside className="mobile-drawer">
           <header><div><span className="eyebrow">Plan {plan === 'managed' ? 'Managed' : 'Essential'}</span><h2>Más opciones</h2></div><button className="icon-button" type="button" onClick={() => setDrawerOpen(false)}><X /></button></header>
-          <nav>{moreItems.map((item) => { const Icon = item.icon; return <button className={screen === item.screen ? 'active' : ''} type="button" key={item.screen} onClick={() => select(item.screen)}><span><Icon size={20} />{item.label}</span><ChevronRight size={18} /></button>; })}</nav>
+          <nav>{moreItems.map((item) => { const Icon = item.icon; return <button className={screen === item.screen ? 'active' : ''} type="button" key={item.screen} onClick={() => select(item.screen)}><span><Icon size={20} />{labelFor(item)}</span><ChevronRight size={18} /></button>; })}</nav>
           <button className="drawer-logout" type="button" onClick={onLogout}><LogOut size={19} /> Cerrar sesión</button>
         </aside>
       </div>}

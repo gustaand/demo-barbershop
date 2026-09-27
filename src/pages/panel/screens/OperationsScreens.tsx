@@ -38,7 +38,10 @@ export function DashboardScreen({ plan, goTo }: { plan: Plan; goTo: (screen: Pan
   const pending = todayAppointments.filter((item) => item.status === 'pending');
   const confirmed = todayAppointments.filter((item) => item.status === 'confirmed');
   const completed = todayAppointments.filter((item) => item.status === 'completed');
-  const next = todayAppointments.find((item) => !['completed', 'no_show'].includes(item.status)) ?? todayAppointments[0];
+  const weekEnd = toDateKey(addDays(new Date(), 7));
+  const weekCount = active.filter((item) => item.date >= today && item.date <= weekEnd).length;
+  const upcomingCount = active.filter((item) => item.date > today).length;
+  const next = active.filter((item) => item.date >= today && !['completed', 'no_show'].includes(item.status)).sort((a, b) => `${a.date}${a.time}`.localeCompare(`${b.date}${b.time}`))[0] ?? todayAppointments[0];
   const upcomingException = data.exceptions.filter((item) => item.endDate >= today).sort((a, b) => a.startDate.localeCompare(b.startDate))[0];
 
   const setStatus = (id: string, status: AppointmentStatus) => {
@@ -59,8 +62,8 @@ export function DashboardScreen({ plan, goTo }: { plan: Plan; goTo: (screen: Pan
           <div className="appointment-list">{todayAppointments.length ? todayAppointments.map((appointment) => <AppointmentRow key={appointment.id} appointment={appointment} onOpen={() => setSelected(appointment)} />) : <EmptyState icon={<CalendarDays />} title="Agenda despejada" text="No hay citas para hoy." action={<button className="button primary" type="button" onClick={() => setManualOpen(true)}>Crear reserva</button>} />}</div>
         </section>
         <aside className="today-side">
-          <section className="panel-card day-summary"><header><h3>Resumen del día</h3><span>{todayAppointments.length} total</span></header><div><p><strong>{confirmed.length}</strong><span>Confirmadas</span></p><p><strong>{pending.length}</strong><span>Pendientes</span></p><p><strong>{completed.length}</strong><span>Completadas</span></p></div></section>
-          {next && <button className="next-appointment" type="button" onClick={() => setSelected(next)}><span>Próxima cita</span><strong>{next.time}</strong><p>{next.customerName}</p><small>{appointmentInfo(data, next).service?.name}</small><ChevronRight /></button>}
+          <section className="panel-card day-summary"><header><h3>Resumen del día</h3><span>{weekCount} esta semana</span></header><div><p><strong>{confirmed.length}</strong><span>Confirmadas</span></p><p><strong>{pending.length}</strong><span>Pendientes</span></p><p><strong>{completed.length}</strong><span>Completadas</span></p><p><strong>{upcomingCount}</strong><span>Próximas</span></p></div></section>
+          {next && <button className="next-appointment" type="button" onClick={() => setSelected(next)}><span>Próxima cita</span><strong>{next.time}</strong><p>{next.customerName}</p><small>{next.date === today ? appointmentInfo(data, next).service?.name : `${formatShortDate(next.date)} · ${appointmentInfo(data, next).service?.name}`}</small><ChevronRight /></button>}
           {pending.length > 0 && <button className="alert-card attention" type="button" onClick={() => setSelected(pending[0])}><span><CircleAlert /></span><div><strong>{pending.length} {pending.length === 1 ? 'cita pendiente' : 'citas pendientes'}</strong><p>Revisa y confirma las solicitudes del día.</p></div><ChevronRight /></button>}
           {upcomingException && <button className="alert-card" type="button" onClick={() => goTo('exceptions')}><span><CalendarDays /></span><div><strong>{upcomingException.reason}</strong><p>{formatShortDate(upcomingException.startDate)}{upcomingException.endDate !== upcomingException.startDate ? ` – ${formatShortDate(upcomingException.endDate)}` : ''}</p></div><ChevronRight /></button>}
         </aside>

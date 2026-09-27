@@ -1,13 +1,14 @@
 import { X } from 'lucide-react';
 import { createContext, useCallback, useContext, useMemo, useState, type FormEvent, type ReactNode } from 'react';
 
-export function Modal({ open, title, children, onClose, wide = false, fullScreen = false }: {
+export function Modal({ open, title, children, onClose, wide = false, fullScreen = false, eyebrow = 'Marques Works' }: {
   open: boolean;
   title: string;
   children: ReactNode;
   onClose: () => void;
   wide?: boolean;
   fullScreen?: boolean;
+  eyebrow?: string;
 }) {
   if (!open) return null;
   return (
@@ -15,7 +16,7 @@ export function Modal({ open, title, children, onClose, wide = false, fullScreen
       <section className={`modal-card ${wide ? 'modal-wide' : ''} ${fullScreen ? 'modal-fullscreen' : ''}`} role="dialog" aria-modal="true" aria-label={title}>
         <header className="modal-header">
           <div>
-            <span className="eyebrow">MW BarberShop</span>
+            <span className="eyebrow">{eyebrow}</span>
             <h2>{title}</h2>
           </div>
           <button className="icon-button" type="button" onClick={onClose} aria-label="Cerrar"><X size={20} /></button>
