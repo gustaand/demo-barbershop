@@ -67,7 +67,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .eyebrow { display: block; color: var(--accent); text-transform: uppercase; font-size: .7rem; font-weight: 800; letter-spacing: .13em; margin-bottom: 6px; }
 
 /* Public website */
-.public-site { --public-bg: #090909; --public-surface: #11100f; --public-line: #2b2520; --public-text: #f8f5f1; --public-muted: #b8b0a9; min-height: 100vh; color: var(--public-text); background: var(--public-bg); font-family: Inter, ui-sans-serif, system-ui, sans-serif; overflow: hidden; }
+.public-site { --public-bg: #090909; --public-surface: #11100f; --public-line: #2b2520; --public-text: #f8f5f1; --public-muted: #b8b0a9; min-height: 100vh; color: var(--public-text); background: var(--public-bg); font-family: Inter, ui-sans-serif, system-ui, sans-serif; overflow-x: clip; }
 .public-header { position: fixed; top: 0; left: 0; right: 0; z-index: 30; height: 68px; display: flex; align-items: center; justify-content: space-between; padding: 0 18px; border-bottom: 1px solid rgba(255,255,255,.08); background: rgba(8,8,8,.9); backdrop-filter: blur(16px); }
 .brand { display: flex; align-items: center; gap: 10px; font-size: 1rem; }
 .brand strong { color: #ce824a; }
@@ -697,6 +697,7 @@ html[data-panel-theme='dark'] .locked-notice, html[data-panel-theme='dark'] .ess
 .public-site .visit-card, .public-site .hours-card { border-color: var(--public-line); border-radius: var(--public-radius); color: var(--public-text); background: color-mix(in srgb, var(--public-surface) 92%, transparent); box-shadow: var(--public-shadow); }
 .public-site .visit-details p, .public-site .hours-card b { color: var(--public-muted); }
 .public-site .visit-details svg, .public-site .hours-card > span { color: var(--public-accent); }
+.public-site .visit-description { max-width: 620px; margin: 14px 0 0; color: var(--public-muted); line-height: 1.65; }
 .public-site .hours-card p { border-color: var(--public-line); }
 .public-site .public-footer { color: var(--public-muted); border-color: var(--public-line); }
 .cards-flat .public-service-card, .cards-flat .team-card { box-shadow: none; border-color: transparent; }
@@ -741,8 +742,8 @@ html[data-panel-theme='dark'] .locked-notice, html[data-panel-theme='dark'] .ess
 .sector-belleza.staff-profile .team-card h3 { color: var(--public-text); font-weight: 500; }
 .sector-belleza.staff-portrait .team-card { color: #fff; }
 .sector-belleza.staff-portrait .team-card p { color: #ded8d4; }
-.sector-belleza.gallery-editorial .gallery-grid { grid-template-columns: 1fr; gap: 14px; }
-.sector-belleza.gallery-editorial .gallery-grid figure, .sector-belleza.gallery-editorial .gallery-grid figure:first-child { min-height: 330px; grid-column: auto; }
+.sector-belleza.gallery-layout-editorial .gallery-grid { grid-template-columns: 1fr; gap: 14px; }
+.sector-belleza.gallery-layout-editorial .gallery-grid figure, .sector-belleza.gallery-layout-editorial .gallery-grid figure:first-child { min-height: 330px; grid-column: auto; }
 .sector-belleza .gallery-grid figcaption { padding: 9px 12px; background: color-mix(in srgb, var(--public-surface) 86%, transparent); }
 
 /* Preset layout variants */
@@ -751,9 +752,9 @@ html[data-panel-theme='dark'] .locked-notice, html[data-panel-theme='dark'] .ess
 .services-list .service-photo { grid-row: 1 / 3; }
 .services-list .public-service-card footer { margin-left: 18px; }
 .services-editorial .public-service-card:nth-child(even) .service-photo { order: 2; }
-.gallery-grid.gallery-grid { align-items: stretch; }
-.gallery-grid .gallery-grid figure { min-height: 210px; }
-.gallery-grid .gallery-grid figure:first-child { grid-column: auto; min-height: 210px; }
+.gallery-layout-grid .gallery-grid { align-items: stretch; }
+.gallery-layout-grid .gallery-grid figure { min-height: 210px; }
+.gallery-layout-grid .gallery-grid figure:first-child { grid-column: auto; min-height: 210px; }
 
 /* Booking follows the public sector while retaining panel accessibility. */
 .sector-belleza .modal-card.modal-fullscreen { --panel-surface: var(--public-surface); --panel-surface-2: var(--public-surface-alt); --panel-text: var(--public-text); --panel-muted: var(--public-muted); --panel-line: var(--public-line); --accent: var(--public-primary); --accent-hover: var(--public-primary-hover); --accent-soft: color-mix(in srgb, var(--public-primary) 12%, var(--public-surface)); color-scheme: light; background: var(--public-surface); }
@@ -800,7 +801,6 @@ html[data-panel-theme='dark'] .admin-sector-selector button.active.beauty { --ac
 .admin-preview-copy p { margin: 0 0 14px; color: inherit; opacity: .76; }
 .admin-preview-copy > div { display: flex; align-items: center; gap: 10px; }
 .admin-preview-copy b { padding: 9px 13px; border-radius: 8px; color: white; font-size: .7rem; }
-.admin-preview-copy i { opacity: .68; font-size: .65rem; font-style: normal; }
 .admin-preview-meta { position: absolute; top: 10px; right: 10px; max-width: 60%; display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 5px; }
 .admin-preview-meta span { padding: 5px 7px; border-radius: 99px; color: white; background: rgba(0,0,0,.5); backdrop-filter: blur(8px); font-size: .54rem; }
 .admin-preview-actions { display: grid; gap: 8px; }
@@ -825,10 +825,6 @@ html[data-panel-theme='dark'] .admin-sector-selector button.active.beauty { --ac
 .choice-grid.images button { grid-template-columns: 70px minmax(0, 1fr); align-items: center; }
 .choice-grid.images button img { grid-row: 1 / 3; width: 70px; height: 54px; object-fit: cover; border-radius: 7px; }
 .choice-grid.images button small { grid-column: 2; }
-.hero-mini { width: 100%; height: 50px; padding: 7px; display: grid; grid-template-columns: 1fr 1fr; gap: 5px; border-radius: 7px; background: var(--panel-surface-2); }
-.hero-mini i, .hero-mini b { border-radius: 3px; background: var(--panel-line); }
-.hero-mini.cinematic, .hero-mini.editorial { display: block; background: linear-gradient(90deg, var(--accent-soft), var(--panel-line)); }
-.hero-mini.minimal, .hero-mini.wellness { padding: 12px; background: var(--panel-bg); }
 .logo-style-grid button { min-height: 82px; align-content: center; }
 .logo-style-grid button > span { color: var(--accent); font-family: Georgia, serif; font-size: 1.05rem; font-weight: 800; }
 .danger-admin-card { display: grid; gap: 14px; border-color: color-mix(in srgb, var(--danger) 24%, var(--panel-line)); }
@@ -875,9 +871,9 @@ html[data-panel-theme='dark'] .admin-sector-selector button.active.beauty { --ac
   .sector-belleza .hero-copy h1 { font-size: clamp(3.7rem, 7vw, 6.2rem); }
   .sector-belleza .beauty-values { padding-left: 34px; padding-right: 34px; }
   .sector-belleza.staff-profile .team-grid { grid-template-columns: repeat(2, 1fr); }
-  .sector-belleza.gallery-editorial .gallery-grid { grid-template-columns: 1.25fr .75fr .75fr; }
-  .sector-belleza.gallery-editorial .gallery-grid figure, .sector-belleza.gallery-editorial .gallery-grid figure:first-child { min-height: 250px; }
-  .sector-belleza.gallery-editorial .gallery-grid figure:first-child { grid-row: span 2; min-height: 514px; }
+  .sector-belleza.gallery-layout-editorial .gallery-grid { grid-template-columns: 1.25fr .75fr .75fr; }
+  .sector-belleza.gallery-layout-editorial .gallery-grid figure, .sector-belleza.gallery-layout-editorial .gallery-grid figure:first-child { min-height: 250px; }
+  .sector-belleza.gallery-layout-editorial .gallery-grid figure:first-child { grid-row: span 2; min-height: 514px; }
   .services-list .public-service-card { grid-template-columns: 200px minmax(0, 1fr); }
   .mw-admin-body { padding: 42px 28px 90px; }
   .admin-welcome { grid-template-columns: minmax(0, 1fr) 420px; align-items: end; }
@@ -1248,4 +1244,316 @@ html[data-panel-theme='dark'] .panel-minimal-beauty .essential-explainer {
   .panel-minimal-beauty .service-table .table-head { background: transparent; }
   .panel-minimal-beauty .service-table > article { min-height: 82px; }
   .panel-minimal-beauty .schedule-editor > article { grid-template-columns: 210px 1fr; }
+}
+
+/* Public configuration fixes: shared hero layouts and real mobile reflow. */
+.public-site,
+.public-site .public-header,
+.public-site .public-hero,
+.public-site .public-section,
+.public-site .beauty-values,
+.public-site .visit-section,
+.public-site .public-footer { width: 100%; min-width: 0; }
+.public-site .hero-copy,
+.public-site .section-heading,
+.public-site .service-grid,
+.public-site .public-service-card,
+.public-site .service-copy,
+.public-site .team-grid,
+.public-site .team-card,
+.public-site .team-card > div,
+.public-site .gallery-grid,
+.public-site .visit-card,
+.public-site .hours-card { min-width: 0; max-width: 100%; }
+.public-site .business-wordmark,
+.public-site .hero-copy h1,
+.public-site .hero-copy > p,
+.public-site .section-heading h2,
+.public-site .public-service-card h3,
+.public-site .public-service-card p,
+.public-site .team-card p,
+.public-site .visit-details span,
+.public-site .hours-card b { overflow-wrap: anywhere; }
+
+/* MW Admin preview consumes the same resolved title, description, image and layout. */
+.admin-preview-copy h2 em { color: inherit; font-style: normal; opacity: .76; }
+.admin-preview-copy h2,
+.admin-preview-copy p { overflow-wrap: anywhere; }
+.admin-preview-layout-cinematic,
+.admin-preview-layout-editorial { background-position: center; background-repeat: no-repeat; background-size: cover; }
+.admin-preview-layout-split,
+.admin-preview-layout-soft-split {
+  justify-content: center;
+  background-position: right center, right center;
+  background-repeat: no-repeat;
+  background-size: 58% 100%, 58% 100%;
+}
+.admin-preview-layout-split .admin-preview-copy,
+.admin-preview-layout-soft-split .admin-preview-copy { width: 48%; max-width: 520px; margin-right: auto; }
+.admin-preview-layout-minimal,
+.admin-preview-layout-wellness {
+  justify-content: flex-end;
+  background-position: center 18px, center 18px;
+  background-repeat: no-repeat;
+  background-size: calc(100% - 36px) 52%, calc(100% - 36px) 52%;
+}
+.admin-preview-layout-minimal .admin-preview-copy,
+.admin-preview-layout-wellness .admin-preview-copy { max-width: 100%; }
+
+/* Beauty heroes: keep the image, copy and both actions in one balanced first view. */
+.sector-belleza .hero-copy > p { max-width: 32rem; }
+.sector-belleza .hero-actions { max-width: 100%; align-items: stretch; }
+.sector-belleza .hero-art img { object-fit: cover; }
+.sector-belleza.preset-nude-elegant .hero-art img { object-position: 68% 46%; }
+.sector-belleza.preset-soft-luxury .hero-art img { object-position: 72% 48%; }
+.sector-belleza.preset-sage-natural .hero-art img { object-position: 66% center; }
+.sector-belleza.preset-clean-beauty .hero-art img { object-position: 72% center; }
+.sector-belleza .public-service-card:last-child .service-photo img { object-position: 70% center; }
+
+@media (min-width: 600px) and (max-width: 759px) {
+  .sector-belleza.layout-editorial .hero-copy { padding-top: 30px; }
+}
+
+@media (min-width: 760px) and (max-width: 919px) {
+  .sector-belleza .desktop-public-nav { display: none; }
+  .sector-belleza .public-menu-button { display: inline-flex; }
+  .sector-belleza .mobile-public-menu { display: block; top: 76px; }
+  .sector-belleza.layout-soft-split .hero-art { height: clamp(340px, 42svh, 420px); }
+  .sector-belleza.layout-soft-split .hero-copy { padding: 26px 34px 44px; }
+  .sector-belleza.layout-wellness .public-hero { padding: 86px 34px 48px; }
+  .sector-belleza.layout-wellness .hero-art { height: clamp(340px, 40svh, 420px); }
+  .sector-belleza.layout-wellness .hero-copy { padding-top: 26px; }
+  .sector-belleza.layout-soft-split .hero-copy h1,
+  .sector-belleza.layout-wellness .hero-copy h1 { font-size: clamp(3.2rem, 6.2vw, 4.3rem); }
+}
+
+@media (min-width: 920px) {
+  .sector-belleza.layout-soft-split .public-hero,
+  .sector-belleza.layout-wellness .public-hero {
+    min-height: max(660px, 100svh);
+    padding: 96px clamp(32px, 4vw, 76px) 34px;
+    grid-template-columns: minmax(0, .95fr) minmax(0, 1.05fr);
+    gap: clamp(28px, 4vw, 72px);
+  }
+  .sector-belleza.layout-soft-split .hero-art,
+  .sector-belleza.layout-wellness .hero-art { height: clamp(490px, calc(100svh - 150px), 680px); }
+  .sector-belleza.layout-soft-split .hero-copy,
+  .sector-belleza.layout-wellness .hero-copy { min-width: 0; }
+  .sector-belleza.layout-soft-split .hero-copy h1,
+  .sector-belleza.layout-wellness .hero-copy h1 { font-size: clamp(3.4rem, 5.5vw, 5.6rem); }
+  .sector-belleza.layout-soft-split .hero-art img { object-position: 76% center; }
+  .sector-belleza.layout-wellness .hero-art img { object-position: 80% center; }
+  .sector-belleza .hero-actions { width: max-content; }
+  .sector-belleza .hero-actions .button { min-width: 138px; }
+}
+
+@media (min-width: 920px) and (max-width: 1180px) {
+  .sector-belleza.layout-soft-split .hero-art img { object-position: 84% center; }
+}
+
+@media (max-width: 599px) {
+  .sector-belleza.layout-editorial .hero-copy h1 { margin-top: 7px; margin-bottom: 8px; }
+  .sector-belleza.layout-editorial .hero-actions { margin-top: 14px; }
+  .sector-belleza .hero-actions { width: 100%; }
+  .sector-belleza.layout-soft-split .hero-art img { object-position: 68% center; }
+  .sector-belleza.layout-wellness .hero-art img { object-position: 73% center; }
+}
+
+@media (max-width: 919px) {
+  .layout-split .public-hero,
+  .layout-soft-split .public-hero {
+    min-height: auto;
+    padding: 68px 0 0;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    align-content: start;
+    background: var(--public-bg);
+  }
+  .layout-split .hero-art,
+  .layout-soft-split .hero-art {
+    position: relative;
+    z-index: 0;
+    inset: auto;
+    width: 100%;
+    height: clamp(290px, 52svh, 470px);
+    grid-column: 1;
+    grid-row: 1;
+    border-radius: 0 0 var(--public-radius) var(--public-radius);
+    box-shadow: none;
+  }
+  .layout-split .hero-art::after,
+  .layout-soft-split .hero-art::after { background: linear-gradient(180deg, transparent 62%, color-mix(in srgb, var(--public-bg) 32%, transparent)); }
+  .layout-split .hero-copy,
+  .layout-soft-split .hero-copy {
+    width: 100%;
+    max-width: 720px;
+    padding: 36px 34px 58px;
+    grid-column: 1;
+    grid-row: 2;
+  }
+  .layout-minimal .public-hero,
+  .layout-wellness .public-hero {
+    min-height: auto;
+    padding: 92px 34px 58px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    align-content: start;
+    background: var(--public-bg);
+  }
+  .layout-minimal .hero-art,
+  .layout-wellness .hero-art {
+    position: relative;
+    z-index: 0;
+    inset: auto;
+    width: 100%;
+    height: clamp(280px, 46svh, 430px);
+    grid-column: 1;
+    grid-row: 1;
+    border-radius: var(--public-radius);
+    box-shadow: var(--public-shadow);
+  }
+  .layout-minimal .hero-art::after,
+  .layout-wellness .hero-art::after { background: linear-gradient(180deg, transparent 68%, color-mix(in srgb, var(--public-bg) 26%, transparent)); }
+  .layout-minimal .hero-copy,
+  .layout-wellness .hero-copy {
+    width: 100%;
+    max-width: 720px;
+    padding: 32px 0 0;
+    grid-column: 1;
+    grid-row: 2;
+  }
+}
+
+@media (max-width: 759px) {
+  .public-site .hero-copy {
+    width: 100%;
+    max-width: 100%;
+    margin-right: 0;
+    margin-left: 0;
+    justify-self: stretch;
+  }
+  .sector-belleza.layout-editorial .public-hero {
+    min-height: auto;
+    padding: 68px 0 0;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    align-content: start;
+    justify-items: stretch;
+    background: var(--public-bg);
+  }
+  .sector-belleza.layout-editorial .hero-art {
+    position: relative;
+    z-index: 0;
+    inset: auto;
+    width: 100%;
+    height: clamp(250px, 68vw, 330px);
+    grid-column: 1;
+    grid-row: 1;
+    border-radius: 0 0 var(--public-radius) var(--public-radius);
+    box-shadow: none;
+  }
+  .sector-belleza.layout-editorial .hero-art::after {
+    background: linear-gradient(180deg, transparent 64%, color-mix(in srgb, var(--public-bg) 28%, transparent));
+  }
+  .sector-belleza.layout-editorial .hero-copy {
+    padding: 28px 34px 44px;
+    grid-column: 1;
+    grid-row: 2;
+  }
+}
+
+@media (max-width: 599px) {
+  .public-site .public-header { padding-right: 16px; padding-left: 16px; }
+  .public-site .brand { min-width: 0; }
+  .public-site .business-wordmark { max-width: min(58vw, 210px); text-overflow: ellipsis; overflow: hidden; white-space: nowrap; }
+  .public-site .public-section { padding-right: 18px; padding-left: 18px; }
+  .public-site .service-grid,
+  .public-site .team-grid,
+  .public-site .gallery-grid,
+  .public-site .visit-section { grid-template-columns: minmax(0, 1fr); }
+  .layout-split .hero-copy,
+  .layout-soft-split .hero-copy { padding: 30px 18px 48px; }
+  .sector-belleza.layout-editorial .hero-copy { padding: 24px 18px 36px; }
+  .layout-minimal .public-hero,
+  .layout-wellness .public-hero { padding: 82px 18px 48px; }
+  .layout-minimal .hero-copy,
+  .layout-wellness .hero-copy { padding-top: 28px; }
+  .layout-split .hero-art,
+  .layout-soft-split .hero-art,
+  .layout-minimal .hero-art,
+  .layout-wellness .hero-art { height: clamp(250px, 64vw, 340px); }
+  .public-site .hero-copy h1 { max-width: 100%; font-size: clamp(2.15rem, 11.5vw, 3.2rem); }
+  .public-site .hero-actions,
+  .sector-belleza .hero-actions { grid-template-columns: minmax(0, 1fr); }
+  .public-site .hero-actions .button { width: 100%; min-width: 0; }
+  .services-list .public-service-card,
+  .sector-belleza.services-list .public-service-card {
+    min-height: 0;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: 170px auto auto;
+  }
+  .services-list .service-photo { width: 100%; grid-row: auto; }
+  .services-list .public-service-card footer { margin-left: 18px; }
+  .services-editorial .public-service-card:nth-child(even) .service-photo { order: initial; }
+  .sector-belleza.staff-profile .team-card {
+    min-height: 0;
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .sector-belleza.staff-profile .team-card img {
+    width: 100%;
+    height: 280px;
+    min-height: 0;
+    object-position: center 24%;
+  }
+  .sector-belleza.staff-profile .team-card > div { width: 100%; padding: 24px 20px 28px; }
+  .public-site .beauty-values { padding-right: 18px; padding-left: 18px; }
+  .public-site .visit-details p { min-width: 0; }
+  .public-site .visit-details span { min-width: 0; }
+  .public-site .hours-card p { grid-template-columns: minmax(0, 1fr); }
+  .admin-preview-layout-split,
+  .admin-preview-layout-soft-split {
+    justify-content: flex-end;
+    background-position: center top, center top;
+    background-size: 100% 54%, 100% 54%;
+  }
+  .admin-preview-layout-split .admin-preview-copy,
+  .admin-preview-layout-soft-split .admin-preview-copy { width: 100%; max-width: 100%; }
+}
+
+/* Shared appointment editing and client contact actions. */
+.contact-actions { display: grid; gap: 9px; }
+.button.whatsapp { color: #fff; border-color: #287a4d; background: #287a4d; }
+.button.whatsapp:hover { background: #216740; }
+.appointment-notes { padding: 14px 15px; border-radius: 12px; background: var(--panel-surface-2); }
+.appointment-notes span { color: var(--panel-muted); font-size: .66rem; font-weight: 700; }
+.appointment-notes p { margin: 5px 0 0; color: var(--panel-text); font-size: .8rem; line-height: 1.5; white-space: pre-wrap; }
+.appointment-edit-form .form-section-title { margin-bottom: 2px; }
+.appointment-edit-form textarea { min-height: 92px; }
+
+@media (min-width: 600px) {
+  .contact-actions { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .appointment-edit-form { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .appointment-edit-form > .field:last-of-type { grid-column: 1 / -1; }
+  .status-actions { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+/* Bring the cinematic barbershop copy into the first view without losing the photo. */
+@media (max-width: 759px) {
+  .sector-barberia.layout-cinematic .public-hero {
+    min-height: min(100svh, 820px);
+    padding-bottom: max(clamp(68px, 11svh, 96px), env(safe-area-inset-bottom));
+  }
+
+  .sector-belleza.layout-editorial .hero-art::after {
+    background: linear-gradient(180deg, transparent 60%, color-mix(in srgb, var(--public-bg) 20%, transparent) 76%, color-mix(in srgb, var(--public-bg) 75%, transparent) 94%, var(--public-bg));
+  }
+}
+
+/* In stacked beauty heroes, blend the photo into the surface below it. */
+@media (max-width: 919px) {
+  .sector-belleza.layout-soft-split .hero-art::after,
+  .sector-belleza.layout-wellness .hero-art::after {
+    background: linear-gradient(180deg, transparent 60%, color-mix(in srgb, var(--public-bg) 20%, transparent) 76%, color-mix(in srgb, var(--public-bg) 75%, transparent) 94%, var(--public-bg));
+  }
 }

@@ -1,5 +1,5 @@
 import { seedDemoData } from '../data/seed';
-import { seedAppearance } from '../config';
+import { cleanHeroText, seedAppearance } from '../config';
 import type { Business, DemoAppearance, DemoData, DemoId, GalleryItem, Service, ThemeMode } from '../types';
 
 const PREFIX = 'mw-demo-v3';
@@ -68,7 +68,16 @@ export const demoRepository = {
 
   loadData(demoId: DemoId): DemoData {
     const stored = parse<DemoData>(localStorage.getItem(key(demoId, 'data')));
-    if (stored?.version === 3) return stored;
+    if (stored?.version === 3) {
+      // Earlier beauty demos reused the brow-design photo for brow waxing.
+      // Update only that seed slot, preserving all customer-edited service data.
+      if (demoId === 'belleza' && stored.services.some((item) => item.id === 'brow-wax' && item.imageSlot === 0)) {
+        const updated = { ...stored, services: stored.services.map((item) => item.id === 'brow-wax' && item.imageSlot === 0 ? { ...item, imageSlot: 4 } : item) };
+        localStorage.setItem(key(demoId, 'data'), JSON.stringify(updated));
+        return updated;
+      }
+      return stored;
+    }
     if (demoId === 'barberia') {
       const migrated = migrateLegacyBarberia();
       if (migrated) return migrated.data;
@@ -78,7 +87,17 @@ export const demoRepository = {
 
   loadAppearance(demoId: DemoId): DemoAppearance {
     const stored = parse<DemoAppearance>(localStorage.getItem(key(demoId, 'appearance')));
-    if (stored?.version === 3) return stored;
+    if (stored?.version === 3) {
+      const normalized = {
+        ...stored,
+        businessName: cleanHeroText(stored.businessName),
+        tagline: cleanHeroText(stored.tagline),
+      };
+      if (normalized.businessName !== stored.businessName || normalized.tagline !== stored.tagline) {
+        localStorage.setItem(key(demoId, 'appearance'), JSON.stringify(normalized));
+      }
+      return normalized;
+    }
     if (demoId === 'barberia' && !localStorage.getItem(key('barberia', 'data'))) {
       const migrated = migrateLegacyBarberia();
       if (migrated) return migrated.appearance;

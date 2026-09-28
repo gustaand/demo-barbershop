@@ -39,7 +39,7 @@ function barberiaSeed(): DemoData {
   return {
     version: 3,
     business: {
-      phone: '+34 603 97 69 85', whatsapp: '+34 603 97 69 85', email: 'hola@mwbarbershop.es',
+      phone: '+34 931 234 567', whatsapp: '34612345678', email: 'hola@mwbarbershop.es',
       address: 'Carrer de la Indústria, 42 · Barcelona',
       description: 'Barbería contemporánea, trato cercano y técnica cuidada. Tu estilo, siempre a punto.',
       instagram: '@mwbarbershop', facebook: 'MW BarberShop',
@@ -89,7 +89,7 @@ function bellezaSeed(): DemoData {
   return {
     version: 3,
     business: {
-      phone: '34 603 97 69 85', whatsapp: '34 603 97 69 85', email: 'hola@mwbeautystudio.es',
+      phone: '+34 932 765 410', whatsapp: '34634567890', email: 'hola@mwbeautystudio.es',
       address: 'Carrer de Provença, 118 · Barcelona',
       description: 'Tratamientos de belleza cuidados, resultados naturales y un espacio pensado para bajar el ritmo.',
       instagram: '@mwbeautystudio', facebook: 'MW Beauty Studio',
@@ -99,7 +99,7 @@ function bellezaSeed(): DemoData {
       { id: 'lash-lift', name: 'Lifting de pestañas', description: 'Curvatura natural y mirada abierta durante semanas.', price: 35, duration: 60, active: true, imageSlot: 1 },
       { id: 'manicure', name: 'Manicura semipermanente', description: 'Preparación cuidada y color duradero con acabado limpio.', price: 25, duration: 60, active: true, imageSlot: 2 },
       { id: 'pedicure', name: 'Pedicura completa', description: 'Cuidado integral, hidratación y acabado impecable.', price: 30, duration: 60, active: true, imageSlot: 3 },
-      { id: 'brow-wax', name: 'Depilación de cejas', description: 'Definición rápida y delicada respetando tu forma natural.', price: 10, duration: 20, active: true, imageSlot: 0 },
+      { id: 'brow-wax', name: 'Depilación de cejas', description: 'Definición rápida y delicada respetando tu forma natural.', price: 10, duration: 20, active: true, imageSlot: 4 },
     ],
     staff: [
       { id: 'laura', name: 'Laura', role: 'Especialista en mirada', bio: 'Diseño de cejas y pestañas con resultados naturales y personalizados.', avatar: '/images/laura.webp', active: true, serviceIds: ['brow-design', 'lash-lift', 'brow-wax'], workingHours: lauraSchedule() },

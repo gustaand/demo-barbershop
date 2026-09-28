@@ -87,7 +87,7 @@ La aplicación migra la antigua demo `mw-demo-v2` a Barbería la primera vez que
 
 `DemoData` contiene la operativa: servicios, profesionales, reservas, horarios, excepciones, galería, solicitudes y contacto.
 
-`DemoAppearance` contiene la presentación: nombre comercial, claim, preset, packs, Hero, logo y ajustes visuales.
+`DemoAppearance` contiene la presentación: nombre comercial, descripción del hero, preset, packs, logo y ajustes visuales. La variante estructural del hero pertenece al preset y no se edita por separado en MW Admin.
 
 Cambiar un preset o un pack no borra reservas ni modifica horarios. Editar servicios o citas no restablece la apariencia.
 
@@ -113,7 +113,7 @@ Los catálogos son distintos y MW Admin sólo muestra las opciones del tenant se
 
 1. Abre el archivo de configuración del sector.
 2. Añade, si hace falta, un `ColorPack`, `FontPack`, `ImagePack` o `HeroVariant`.
-3. Añade un elemento a `presets` referenciando sus IDs.
+3. Añade un elemento a `presets` referenciando sus IDs. La variante de hero queda fijada por ese preset.
 4. Define sus `visual settings`: radios, sombras, espaciado, botones, cards, tratamiento de imagen y layouts.
 5. Ejecuta `pnpm typecheck`, `pnpm lint` y `pnpm build`.
 
@@ -157,7 +157,7 @@ Permite, sin tocar código:
 - seleccionar Barbería o Belleza;
 - cambiar nombre, claim y datos rápidos;
 - aplicar un preset completo;
-- ajustar color, fuentes, imágenes y Hero de forma individual;
+- ajustar color, fuentes e imágenes de forma individual;
 - elegir el estilo del logo;
 - abrir web, Managed y Essential;
 - restablecer únicamente el tenant seleccionado.
@@ -173,6 +173,8 @@ El motor compartido comprueba:
 - citas existentes y duración completa del servicio.
 
 Una reserva web o manual bloquea el hueco. Cancelarla lo libera. La confirmación permite descargar un archivo `.ics`.
+
+Desde la agenda de Managed y Essential se puede abrir y editar una cita completa. Si contiene un teléfono válido, la acción «Contactar con cliente» abre su conversación en WhatsApp sin escribir ni enviar mensajes automáticamente.
 
 ## Vercel
 

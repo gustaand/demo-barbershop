@@ -1,10 +1,11 @@
 import { useMemo, useState } from 'react';
-import { CalendarDays, Check, ChevronLeft, ChevronRight, CircleAlert, Phone, Plus } from 'lucide-react';
+import { CalendarDays, Check, ChevronLeft, ChevronRight, CircleAlert, MessageCircle, Pencil, Phone, Plus } from 'lucide-react';
 import { EmptyState, Field, Form, Modal, StatusBadge, useToast } from '../../../components/UI';
 import { useDemo } from '../../../store/DemoContext';
 import type { Appointment, AppointmentStatus, Plan } from '../../../types';
 import { appointmentEnd, getAvailableSlots } from '../../../utils/availability';
 import { addDays, formatDate, formatShortDate, fromDateKey, todayKey, toDateKey, uid } from '../../../utils/date';
+import { whatsappConversationUrl } from '../../../utils/phone';
 import type { PanelScreen } from '../panelTypes';
 
 function appointmentInfo(data: ReturnType<typeof useDemo>['data'], appointment: Appointment) {
@@ -28,8 +29,7 @@ function AppointmentRow({ appointment, onOpen }: { appointment: Appointment; onO
 }
 
 export function DashboardScreen({ plan, goTo }: { plan: Plan; goTo: (screen: PanelScreen) => void }) {
-  const { data, update } = useDemo();
-  const toast = useToast();
+  const { data } = useDemo();
   const [manualOpen, setManualOpen] = useState(false);
   const [selected, setSelected] = useState<Appointment | null>(null);
   const today = todayKey();
@@ -43,12 +43,6 @@ export function DashboardScreen({ plan, goTo }: { plan: Plan; goTo: (screen: Pan
   const upcomingCount = active.filter((item) => item.date > today).length;
   const next = active.filter((item) => item.date >= today && !['completed', 'no_show'].includes(item.status)).sort((a, b) => `${a.date}${a.time}`.localeCompare(`${b.date}${b.time}`))[0] ?? todayAppointments[0];
   const upcomingException = data.exceptions.filter((item) => item.endDate >= today).sort((a, b) => a.startDate.localeCompare(b.startDate))[0];
-
-  const setStatus = (id: string, status: AppointmentStatus) => {
-    update((draft) => { const item = draft.appointments.find((appointment) => appointment.id === id); if (item) item.status = status; });
-    setSelected((current) => current ? { ...current, status } : current);
-    toast(status === 'cancelled' ? 'Cita cancelada; el horario vuelve a estar disponible' : 'Estado de la reserva actualizado');
-  };
 
   return (
     <div className="screen-stack">
@@ -69,27 +63,20 @@ export function DashboardScreen({ plan, goTo }: { plan: Plan; goTo: (screen: Pan
         </aside>
       </div>
       <ManualAppointmentModal open={manualOpen} onClose={() => setManualOpen(false)} />
-      <Modal open={Boolean(selected)} title="Detalle de la reserva" onClose={() => setSelected(null)}>{selected && <AppointmentDetail appointment={selected} onStatus={setStatus} />}</Modal>
+      <Modal open={Boolean(selected)} title="Detalle de la reserva" onClose={() => setSelected(null)} wide>{selected && <AppointmentDetail key={selected.id} appointment={selected} onChange={setSelected} />}</Modal>
     </div>
   );
 }
 
 export function AgendaScreen(props: { plan: Plan }) {
   void props.plan;
-  const { data, update } = useDemo();
-  const toast = useToast();
+  const { data } = useDemo();
   const [date, setDate] = useState(todayKey());
   const [view, setView] = useState<'day' | 'week'>('day');
   const [manualOpen, setManualOpen] = useState(false);
   const [selected, setSelected] = useState<Appointment | null>(null);
   const dayAppointments = data.appointments.filter((item) => item.status !== 'cancelled' && item.date === date).sort((a, b) => a.time.localeCompare(b.time));
   const weekDates = Array.from({ length: 7 }, (_, index) => toDateKey(addDays(fromDateKey(date), index)));
-
-  const setStatus = (id: string, status: AppointmentStatus) => {
-    update((draft) => { const item = draft.appointments.find((appointment) => appointment.id === id); if (item) item.status = status; });
-    setSelected((current) => current ? { ...current, status } : current);
-    toast(status === 'cancelled' ? 'Cita cancelada; el horario vuelve a estar disponible' : 'Estado de la reserva actualizado');
-  };
 
   return (
     <div className="screen-stack">
@@ -105,15 +92,14 @@ export function AgendaScreen(props: { plan: Plan }) {
         )}
       </section>
       <ManualAppointmentModal open={manualOpen} onClose={() => setManualOpen(false)} />
-      <Modal open={Boolean(selected)} title="Detalle de la reserva" onClose={() => setSelected(null)}>{selected && <AppointmentDetail appointment={selected} onStatus={setStatus} />}</Modal>
+      <Modal open={Boolean(selected)} title="Detalle de la reserva" onClose={() => setSelected(null)} wide>{selected && <AppointmentDetail key={selected.id} appointment={selected} onChange={setSelected} />}</Modal>
     </div>
   );
 }
 
 export function AppointmentsScreen(props: { plan: Plan }) {
   void props.plan;
-  const { data, update } = useDemo();
-  const toast = useToast();
+  const { data } = useDemo();
   const [filter, setFilter] = useState<'today' | 'upcoming' | 'all'>('today');
   const [manualOpen, setManualOpen] = useState(false);
   const [selected, setSelected] = useState<Appointment | null>(null);
@@ -121,12 +107,6 @@ export function AppointmentsScreen(props: { plan: Plan }) {
   const appointments = data.appointments
     .filter((item) => filter === 'all' || (filter === 'today' ? item.date === today : item.date >= today && item.status !== 'cancelled'))
     .sort((a, b) => `${a.date}${a.time}`.localeCompare(`${b.date}${b.time}`));
-
-  const setStatus = (id: string, status: AppointmentStatus) => {
-    update((draft) => { const item = draft.appointments.find((appointment) => appointment.id === id); if (item) item.status = status; });
-    setSelected((current) => current ? { ...current, status } : current);
-    toast(status === 'cancelled' ? 'Cita cancelada; el horario vuelve a estar disponible' : 'Estado de la reserva actualizado');
-  };
 
   return (
     <div className="screen-stack">
@@ -136,17 +116,68 @@ export function AppointmentsScreen(props: { plan: Plan }) {
         <div className="appointment-list grouped">{appointments.length ? appointments.map((appointment, index) => <div key={appointment.id}>{(index === 0 || appointments[index - 1].date !== appointment.date) && <h4 className="date-separator">{formatDate(appointment.date)}</h4>}<AppointmentRow appointment={appointment} onOpen={() => setSelected(appointment)} /></div>) : <EmptyState icon={<CalendarDays />} title="No hay reservas" text="Cambia el filtro o crea una reserva manual." action={<button className="button primary" type="button" onClick={() => setManualOpen(true)}>Crear reserva</button>} />}</div>
       </section>
       <ManualAppointmentModal open={manualOpen} onClose={() => setManualOpen(false)} />
-      <Modal open={Boolean(selected)} title="Detalle de la reserva" onClose={() => setSelected(null)}>
-        {selected && <AppointmentDetail appointment={selected} onStatus={setStatus} />}
+      <Modal open={Boolean(selected)} title="Detalle de la reserva" onClose={() => setSelected(null)} wide>
+        {selected && <AppointmentDetail key={selected.id} appointment={selected} onChange={setSelected} />}
       </Modal>
     </div>
   );
 }
 
-function AppointmentDetail({ appointment, onStatus }: { appointment: Appointment; onStatus: (id: string, status: AppointmentStatus) => void }) {
-  const { data } = useDemo();
+function AppointmentDetail({ appointment, onChange }: { appointment: Appointment; onChange: (appointment: Appointment) => void }) {
+  const { data, update } = useDemo();
+  const toast = useToast();
+  const [editing, setEditing] = useState(false);
   const { service, staff } = appointmentInfo(data, appointment);
-  return <div className="detail-stack"><div className="detail-hero"><span className="detail-avatar">{appointment.customerName.slice(0, 1)}</span><div><h3>{appointment.customerName}</h3><p><Phone size={15} /> {appointment.phone}</p></div><StatusBadge status={appointment.status} /></div><div className="detail-grid"><p><span>Fecha</span><strong>{formatDate(appointment.date)}</strong></p><p><span>Hora</span><strong>{appointment.time}–{appointmentEnd(data, appointment.serviceId, appointment.time)}</strong></p><p><span>Servicio</span><strong>{service?.name}</strong></p><p><span>Profesional</span><strong>{staff?.name}</strong></p><p><span>Precio</span><strong>{service?.price.toFixed(2)} €</strong></p><p><span>Origen</span><strong>{appointment.source === 'web' ? 'Web' : appointment.source === 'phone' ? 'Teléfono' : appointment.source === 'whatsapp' ? 'WhatsApp' : 'Presencial'}</strong></p></div><div className="status-actions">{appointment.status === 'pending' && <button className="button success" type="button" onClick={() => onStatus(appointment.id, 'confirmed')}><Check size={18} /> Confirmar</button>}{!['completed', 'cancelled'].includes(appointment.status) && <button className="button subtle" type="button" onClick={() => onStatus(appointment.id, 'completed')}>Marcar completada</button>}{!['no_show', 'completed', 'cancelled'].includes(appointment.status) && <button className="button subtle" type="button" onClick={() => onStatus(appointment.id, 'no_show')}>No-show</button>}{appointment.status !== 'cancelled' && <button className="button danger-ghost" type="button" onClick={() => onStatus(appointment.id, 'cancelled')}>Cancelar cita</button>}</div></div>;
+  const whatsappUrl = whatsappConversationUrl(appointment.phone);
+  const setStatus = (status: AppointmentStatus) => {
+    const next = { ...appointment, status };
+    update((draft) => { const item = draft.appointments.find((candidate) => candidate.id === appointment.id); if (item) item.status = status; });
+    onChange(next);
+    toast(status === 'cancelled' ? 'Cita cancelada; el horario vuelve a estar disponible' : 'Estado de la reserva actualizado');
+  };
+
+  if (editing) return <AppointmentEditForm appointment={appointment} onCancel={() => setEditing(false)} onSaved={(next) => { onChange(next); setEditing(false); }} />;
+
+  return <div className="detail-stack"><div className="detail-hero"><span className="detail-avatar">{appointment.customerName.slice(0, 1)}</span><div><h3>{appointment.customerName}</h3><p><Phone size={15} /> {appointment.phone || 'Sin teléfono'}</p></div><StatusBadge status={appointment.status} /></div><div className="detail-grid"><p><span>Fecha</span><strong>{formatDate(appointment.date)}</strong></p><p><span>Hora</span><strong>{appointment.time}–{appointmentEnd(data, appointment.serviceId, appointment.time)}</strong></p><p><span>Servicio</span><strong>{service?.name}</strong></p><p><span>Profesional</span><strong>{staff?.name}</strong></p><p><span>Precio</span><strong>{service?.price.toFixed(2)} €</strong></p><p><span>Origen</span><strong>{appointment.source === 'web' ? 'Web' : appointment.source === 'phone' ? 'Teléfono' : appointment.source === 'whatsapp' ? 'WhatsApp' : 'Presencial'}</strong></p></div>{appointment.notes && <div className="appointment-notes"><span>Notas</span><p>{appointment.notes}</p></div>}<div className="contact-actions"><button className="button primary" type="button" onClick={() => setEditing(true)}><Pencil size={17} /> Editar cita</button>{whatsappUrl && <a className="button whatsapp" href={whatsappUrl} target="_blank" rel="noreferrer"><MessageCircle size={18} /> Contactar con cliente</a>}</div><div className="status-actions">{appointment.status === 'pending' && <button className="button success" type="button" onClick={() => setStatus('confirmed')}><Check size={18} /> Confirmar</button>}{!['completed', 'cancelled'].includes(appointment.status) && <button className="button subtle" type="button" onClick={() => setStatus('completed')}>Marcar completada</button>}{!['no_show', 'completed', 'cancelled'].includes(appointment.status) && <button className="button subtle" type="button" onClick={() => setStatus('no_show')}>No-show</button>}{appointment.status !== 'cancelled' && <button className="button danger-ghost" type="button" onClick={() => setStatus('cancelled')}>Cancelar cita</button>}</div></div>;
+}
+
+const appointmentStatusOptions: { value: AppointmentStatus; label: string }[] = [
+  { value: 'pending', label: 'Pendiente' },
+  { value: 'confirmed', label: 'Confirmada' },
+  { value: 'completed', label: 'Completada' },
+  { value: 'no_show', label: 'No-show' },
+  { value: 'cancelled', label: 'Cancelada' },
+];
+
+function AppointmentEditForm({ appointment, onCancel, onSaved }: { appointment: Appointment; onCancel: () => void; onSaved: (appointment: Appointment) => void }) {
+  const { data, update } = useDemo();
+  const toast = useToast();
+  const [serviceId, setServiceId] = useState(appointment.serviceId);
+  const [staffId, setStaffId] = useState(appointment.staffId);
+  const [date, setDate] = useState(appointment.date);
+  const [time, setTime] = useState(appointment.time);
+  const [name, setName] = useState(appointment.customerName);
+  const [phone, setPhone] = useState(appointment.phone);
+  const [status, setStatus] = useState<AppointmentStatus>(appointment.status);
+  const [source, setSource] = useState<Appointment['source']>(appointment.source);
+  const [notes, setNotes] = useState(appointment.notes ?? '');
+  const [error, setError] = useState('');
+  const availableStaff = data.staff.filter((member) => member.active && member.serviceIds.includes(serviceId));
+  const slots = useMemo(() => serviceId && staffId && date ? getAvailableSlots(data, serviceId, staffId, date, appointment.id) : [], [appointment.id, data, serviceId, staffId, date]);
+  const originalSlotSelected = serviceId === appointment.serviceId && staffId === appointment.staffId && date === appointment.date && time === appointment.time;
+  const timeOptions = slots.some((slot) => slot.time === time) || !originalSlotSelected ? slots : [{ time: appointment.time, staffId: appointment.staffId }, ...slots].sort((a, b) => a.time.localeCompare(b.time));
+
+  const save = () => {
+    if (!name.trim() || !serviceId || !staffId || !date || !time) { setError('Completa cliente, servicio, profesional, fecha y hora.'); return; }
+    if (phone.trim() && !whatsappConversationUrl(phone)) { setError('Introduce un teléfono válido o deja el campo vacío.'); return; }
+    if (!originalSlotSelected && !getAvailableSlots(data, serviceId, staffId, date, appointment.id).some((slot) => slot.time === time && slot.staffId === staffId)) { setError('Ese horario no está disponible para el servicio y profesional seleccionados.'); return; }
+    const next: Appointment = { ...appointment, serviceId, staffId, date, time, customerName: name.trim(), phone: phone.trim(), status, source, notes: notes.trim() || undefined };
+    update((draft) => { const item = draft.appointments.find((candidate) => candidate.id === appointment.id); if (item) Object.assign(item, next); });
+    onSaved(next);
+    toast('Cita actualizada y guardada en la agenda');
+  };
+
+  return <Form onSubmit={save} className="form-grid appointment-edit-form"><div className="form-section-title form-span"><Pencil /><div><h3>Editar cita</h3><p>Los cambios se aplican al instante en la agenda.</p></div></div><Field label="Cliente *"><input value={name} onChange={(event) => setName(event.target.value)} autoComplete="name" /></Field><Field label="Teléfono / WhatsApp"><input value={phone} onChange={(event) => setPhone(event.target.value)} inputMode="tel" autoComplete="tel" /></Field><Field label="Servicio *"><select value={serviceId} onChange={(event) => { const nextService = event.target.value; setServiceId(nextService); if (!data.staff.some((member) => member.id === staffId && member.active && member.serviceIds.includes(nextService))) setStaffId(''); setTime(''); }}><option value="">Selecciona un servicio</option>{data.services.filter((item) => item.active || item.id === appointment.serviceId).map((item) => <option key={item.id} value={item.id}>{item.name} · {item.duration} min</option>)}</select></Field><Field label="Profesional *"><select value={staffId} disabled={!serviceId} onChange={(event) => { setStaffId(event.target.value); setTime(''); }}><option value="">Selecciona profesional</option>{availableStaff.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</select></Field><Field label="Fecha *"><input type="date" min={todayKey()} value={date} onChange={(event) => { setDate(event.target.value); setTime(''); }} /></Field><Field label="Hora *"><select value={time} disabled={!staffId || !date} onChange={(event) => setTime(event.target.value)}><option value="">Selecciona un hueco</option>{timeOptions.map((slot) => <option key={`${slot.time}-${slot.staffId}`} value={slot.time}>{slot.time}</option>)}</select></Field><Field label="Estado"><select value={status} onChange={(event) => setStatus(event.target.value as AppointmentStatus)}>{appointmentStatusOptions.map((item) => <option key={item.value} value={item.value}>{item.label}</option>)}</select></Field><Field label="Origen"><select value={source} onChange={(event) => setSource(event.target.value as Appointment['source'])}><option value="web">Web</option><option value="phone">Teléfono</option><option value="whatsapp">WhatsApp</option><option value="walk_in">Presencial</option></select></Field><Field label="Notas"><textarea rows={3} value={notes} onChange={(event) => setNotes(event.target.value)} placeholder="Información útil para la cita" /></Field>{error && <p className="inline-error form-span">{error}</p>}<div className="form-actions form-span"><button className="button ghost" type="button" onClick={onCancel}>Cancelar</button><button className="button primary" type="submit">Guardar cambios</button></div></Form>;
 }
 
 function ManualAppointmentModal({ open, onClose }: { open: boolean; onClose: () => void }) {

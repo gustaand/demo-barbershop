@@ -1,15 +1,17 @@
 import { useMemo, useState, type CSSProperties } from 'react';
-import { CalendarDays, Camera, Check, ChevronRight, Clock3, Flower2, MapPin, Menu, MessageCircle, Phone, Scissors, Sparkles, Star, X } from 'lucide-react';
+import { CalendarDays, Camera, Check, ChevronRight, Clock3, Eye, Footprints, Hand, MapPin, Menu, MessageCircle, Phone, Scissors, Sparkles, Star, X } from 'lucide-react';
 import { useDemo } from '../store/DemoContext';
 import { Modal, useToast } from '../components/UI';
 import { getAvailableSlots } from '../utils/availability';
 import { addDays, DAY_NAMES, formatDate, todayKey, toDateKey, uid } from '../utils/date';
 import { downloadAppointmentIcs } from '../utils/ics';
-import { initials } from '../config';
+import { initials, resolvePresentation } from '../config';
+import { HeroHeading } from '../components/HeroHeading';
 import type { Appointment, ImagePack } from '../types';
+import { whatsappConversationUrl } from '../utils/phone';
 
 const barberIcons = [Scissors, Sparkles, Star, Scissors, Sparkles];
-const beautyIcons = [Sparkles, Star, Flower2, Sparkles, Star];
+const beautyIcons = { 'brow-design': Sparkles, 'lash-lift': Eye, manicure: Hand, pedicure: Footprints, 'brow-wax': Sparkles } as const;
 const radiusValues = { none: '0px', subtle: '8px', soft: '18px', rounded: '28px' } as const;
 const shadowValues = { none: 'none', subtle: '0 16px 42px rgba(32,24,18,.08)', elevated: '0 22px 60px rgba(32,24,18,.16)' } as const;
 
@@ -18,9 +20,10 @@ function imageAt(images: string[], slot: number) {
 }
 
 function BusinessLogo({ compact = false }: { compact?: boolean }) {
-  const { appearance } = useDemo();
-  if (appearance.logoStyle === 'text') return <span className="business-wordmark">{appearance.businessName}</span>;
-  return <><span className={`business-monogram ${compact ? 'compact' : ''}`}>{appearance.logoStyle === 'monogram' ? initials(appearance.businessName) : 'MW'}</span><span className="business-wordmark">{appearance.businessName}</span></>;
+  const { config, appearance } = useDemo();
+  const businessName = resolvePresentation(config, appearance).heroTitle;
+  if (appearance.logoStyle === 'text') return <span className="business-wordmark">{businessName}</span>;
+  return <><span className={`business-monogram ${compact ? 'compact' : ''}`}>{appearance.logoStyle === 'monogram' ? initials(businessName) : 'MW'}</span><span className="business-wordmark">{businessName}</span></>;
 }
 
 export function PublicSite() {
@@ -29,11 +32,9 @@ export function PublicSite() {
   const [menuOpen, setMenuOpen] = useState(false);
   const services = data.services.filter((item) => item.active);
   const gallery = data.gallery.filter((item) => item.active).sort((a, b) => a.order - b.order);
-  const colors = config.colorPacks.find((item) => item.id === appearance.colorPackId) ?? config.colorPacks[0];
-  const fonts = config.fontPacks.find((item) => item.id === appearance.fontPackId) ?? config.fontPacks[0];
-  const images = config.imagePacks.find((item) => item.id === appearance.imagePackId) ?? config.imagePacks[0];
-  const hero = config.heroVariants.find((item) => item.id === appearance.heroVariantId) ?? config.heroVariants[0];
-  const icons = demoId === 'barberia' ? barberIcons : beautyIcons;
+  const presentation = resolvePresentation(config, appearance);
+  const { colorPack: colors, fontPack: fonts, imagePack: images, heroVariant: hero, visual } = presentation;
+  const businessWhatsappUrl = whatsappConversationUrl(data.business.whatsapp);
 
   const style = {
     '--public-primary': colors.tokens.primary,
@@ -50,8 +51,8 @@ export function PublicSite() {
     '--public-danger': colors.tokens.danger,
     '--public-heading-font': fonts.heading,
     '--public-body-font': fonts.body,
-    '--public-radius': radiusValues[appearance.visual.radius],
-    '--public-shadow': shadowValues[appearance.visual.shadow],
+    '--public-radius': radiusValues[visual.radius],
+    '--public-shadow': shadowValues[visual.shadow],
     '--public-backdrop': `url(${images.backdrop})`,
   } as CSSProperties;
 
@@ -65,7 +66,7 @@ export function PublicSite() {
     : [['Tratamientos', 'servicios'], ['Profesionales', 'equipo'], ['El estudio', 'galeria'], ['Contacto', 'ubicacion']];
 
   return (
-    <main className={`public-site sector-${demoId} layout-${hero.layout} spacing-${appearance.visual.spacing} buttons-${appearance.visual.buttons} cards-${appearance.visual.cards} images-${appearance.visual.imageTreatment} services-${appearance.visual.serviceLayout} staff-${appearance.visual.staffLayout} gallery-${appearance.visual.galleryLayout}`} style={style}>
+    <main className={`public-site sector-${demoId} preset-${appearance.presetId} layout-${hero.layout} spacing-${visual.spacing} buttons-${visual.buttons} cards-${visual.cards} images-${visual.imageTreatment} services-${visual.serviceLayout} staff-${visual.staffLayout} gallery-layout-${visual.galleryLayout}`} style={style}>
       <header className="public-header">
         <a className="brand" href="#inicio" onClick={() => goTo('inicio')}><BusinessLogo compact /></a>
         <nav className="desktop-public-nav" aria-label="Navegación principal">
@@ -80,12 +81,12 @@ export function PublicSite() {
       <section className="public-hero" id="inicio">
         <div className="hero-art" aria-hidden="true"><img src={images.hero} alt="" /><div className="hero-art-label"><span>{demoId === 'barberia' ? 'Desde 2018' : 'Cuidado experto'}</span><strong>Barcelona</strong></div></div>
         <div className="hero-copy">
-          <span className="public-kicker">{config.publicKicker}</span>
-          <h1>{config.heroTitleLead}<br /><em>{config.heroTitleAccent}</em></h1>
-          <p>{appearance.tagline} {data.business.description}</p>
+          <span className="public-kicker">{presentation.heroEyebrow}</span>
+          <HeroHeading title={presentation.heroTitle} />
+          <p>{presentation.heroDescription}</p>
           <div className="hero-actions">
             <button className="button public-primary large" type="button" onClick={() => setBookingOpen(true)}><CalendarDays size={19} /> Reservar cita</button>
-            <a className="button public-secondary large" href={`https://wa.me/${data.business.whatsapp}`} target="_blank" rel="noreferrer"><MessageCircle size={19} /> WhatsApp</a>
+            {businessWhatsappUrl && <a className="button public-secondary large" href={businessWhatsappUrl} target="_blank" rel="noreferrer"><MessageCircle size={19} /> WhatsApp</a>}
           </div>
           <div className="hero-trust"><span><Check size={16} /> Sin registro</span><span><Check size={16} /> Confirmación inmediata</span></div>
         </div>
@@ -97,7 +98,7 @@ export function PublicSite() {
         <div className="section-heading"><div><span className="public-kicker">{config.servicesEyebrow}</span><h2>{config.servicesTitle}</h2></div><p>{config.servicesText}</p></div>
         <div className="service-grid">
           {services.map((service, index) => {
-            const Icon = icons[index % icons.length];
+            const Icon = demoId === 'belleza' ? beautyIcons[service.id as keyof typeof beautyIcons] ?? Sparkles : barberIcons[index % barberIcons.length];
             return <article className="public-service-card" key={service.id}><div className="service-photo"><img src={imageAt(images.services, service.imageSlot)} alt="" /><span className="service-icon"><Icon size={22} /></span></div><div className="service-copy"><span className="service-number">0{index + 1}</span><h3>{service.name}</h3><p>{service.description}</p></div><footer><span><Clock3 size={15} /> {service.duration} min</span><strong>{service.price.toFixed(0)} €</strong></footer></article>;
           })}
         </div>
@@ -114,7 +115,7 @@ export function PublicSite() {
       </section>
 
       <section className="visit-section" id="ubicacion" style={{ backgroundImage: `linear-gradient(90deg, color-mix(in srgb, var(--public-bg) 96%, transparent), color-mix(in srgb, var(--public-bg) 70%, transparent)), url(${images.backdrop})` }}>
-        <div className="visit-card"><span className="public-kicker">Ven a vernos</span><h2>{config.visitHeading}</h2><div className="visit-details"><p><MapPin size={19} /><span>{data.business.address}</span></p><p><Phone size={19} /><span>{data.business.phone}</span></p><p><Camera size={19} /><span>{data.business.instagram}</span></p></div><button className="button public-primary large" type="button" onClick={() => setBookingOpen(true)}>Reservar ahora</button></div>
+        <div className="visit-card"><span className="public-kicker">Ven a vernos</span><h2>{config.visitHeading}</h2><p className="visit-description">{data.business.description}</p><div className="visit-details"><p><MapPin size={19} /><span>{data.business.address}</span></p><p><Phone size={19} /><span>{data.business.phone}</span></p><p><Camera size={19} /><span>{data.business.instagram}</span></p></div><button className="button public-primary large" type="button" onClick={() => setBookingOpen(true)}>Reservar ahora</button></div>
         <div className="hours-card"><span>Horario habitual</span>{[1, 2, 3, 4, 5, 6, 0].map((day) => { const schedule = data.openingHours[day]; return <p key={day}><strong>{DAY_NAMES[day]}</strong><b>{schedule.open ? schedule.intervals.map((interval) => `${interval.start}–${interval.end}`).join(' · ') : 'Cerrado'}</b></p>; })}</div>
       </section>
 

@@ -55,7 +55,7 @@ Color Pack
 + Visual Settings
 ```
 
-Después de aplicar el preset, MW Admin puede cambiar cualquiera de los cuatro packs sin restablecer los demás.
+Después de aplicar el preset, MW Admin puede cambiar de forma independiente color, fuentes e imágenes sin restablecer los demás ajustes. La variante estructural del hero permanece ligada al preset para mantener estable la demo comercial.
 
 Barbería y Belleza exportan catálogos separados. Un componente sólo recibe la configuración del `demoId` activo, de modo que no puede ofrecer opciones del otro sector.
 

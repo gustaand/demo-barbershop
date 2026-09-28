@@ -1,7 +1,8 @@
 import { useMemo, useState } from 'react';
 import { Check, ExternalLink, Eye, EyeOff, LockKeyhole, LogOut, Monitor, Moon, RotateCcw, Scissors, Sparkles, Sun } from 'lucide-react';
-import { applyPreset, initials } from '../../config';
+import { applyPreset, initials, resolvePresentation } from '../../config';
 import { ConfirmDialog, Field, useToast } from '../../components/UI';
+import { HeroHeading } from '../../components/HeroHeading';
 import { DemoProvider, useDemo } from '../../store/DemoContext';
 import { usePanelTheme } from '../../store/PanelThemeContext';
 import type { DemoId, LogoStyle, ThemeMode } from '../../types';
@@ -90,10 +91,8 @@ function DemoEditor() {
   const { demoId, config, data, appearance, updateData, updateAppearance, reset } = useDemo();
   const toast = useToast();
   const [confirmReset, setConfirmReset] = useState(false);
-  const colorPack = config.colorPacks.find((item) => item.id === appearance.colorPackId) ?? config.colorPacks[0];
-  const fontPack = config.fontPacks.find((item) => item.id === appearance.fontPackId) ?? config.fontPacks[0];
-  const imagePack = config.imagePacks.find((item) => item.id === appearance.imagePackId) ?? config.imagePacks[0];
-  const heroVariant = config.heroVariants.find((item) => item.id === appearance.heroVariantId) ?? config.heroVariants[0];
+  const presentation = resolvePresentation(config, appearance);
+  const { colorPack, fontPack, imagePack, heroVariant } = presentation;
   const base = `/demo/${demoId}`;
 
   const setBusiness = (field: keyof typeof data.business, value: string) => updateData((draft) => { draft.business[field] = value; });
@@ -106,6 +105,7 @@ function DemoEditor() {
 
   const previewStyle = useMemo(() => ({
     backgroundImage: `linear-gradient(90deg, ${colorPack.tokens.background}f2 3%, ${colorPack.tokens.background}77 58%, transparent), url(${imagePack.hero})`,
+    backgroundColor: colorPack.tokens.background,
     color: colorPack.tokens.text,
     borderColor: colorPack.tokens.border,
     fontFamily: fontPack.body,
@@ -115,8 +115,8 @@ function DemoEditor() {
     <div className="admin-editor">
       <div className={`editing-banner ${demoId}`}><span>Editando</span><strong>{config.sectorLabel}</strong><p>Todos los controles de esta pantalla afectan exclusivamente a esta demo.</p></div>
 
-      <section className="admin-preview-card" style={previewStyle}>
-        <div className="admin-preview-copy"><span style={{ color: colorPack.tokens.accent }}>{config.heroEyebrow}</span><h2 style={{ fontFamily: fontPack.heading }}>{appearance.businessName}</h2><p>{appearance.tagline}</p><div><b style={{ background: colorPack.tokens.primary }}>Reservar cita</b><i>{heroVariant.label}</i></div></div>
+      <section className={`admin-preview-card admin-preview-layout-${heroVariant.layout}`} style={previewStyle}>
+        <div className="admin-preview-copy"><span style={{ color: colorPack.tokens.accent }}>{presentation.heroEyebrow}</span><HeroHeading title={presentation.heroTitle} level={2} style={{ fontFamily: fontPack.heading }} /><p>{presentation.heroDescription}</p><div><b style={{ background: colorPack.tokens.primary }}>Reservar cita</b></div></div>
         <div className="admin-preview-meta"><span>{config.presets.find((item) => item.id === appearance.presetId)?.label}</span><span>{colorPack.label}</span><span>{fontPack.label}</span><span>{imagePack.label}</span></div>
       </section>
 
@@ -130,7 +130,7 @@ function DemoEditor() {
         <header><span>01</span><div><h2>Datos rápidos</h2><p>Los cambios se guardan al instante.</p></div></header>
         <div className="admin-fields-grid">
           <Field label="Nombre comercial"><input value={appearance.businessName} maxLength={48} onChange={(event) => updateAppearance((draft) => { draft.businessName = event.target.value; })} /></Field>
-          <Field label="Claim / subtítulo"><input value={appearance.tagline} maxLength={80} onChange={(event) => updateAppearance((draft) => { draft.tagline = event.target.value; })} /></Field>
+          <Field label="Descripción del hero"><input value={appearance.tagline} maxLength={140} onChange={(event) => updateAppearance((draft) => { draft.tagline = event.target.value; })} /></Field>
           <Field label="Teléfono"><input value={data.business.phone} onChange={(event) => setBusiness('phone', event.target.value)} /></Field>
           <Field label="WhatsApp"><input value={data.business.whatsapp} onChange={(event) => setBusiness('whatsapp', event.target.value)} /></Field>
           <Field label="Dirección"><input value={data.business.address} onChange={(event) => setBusiness('address', event.target.value)} /></Field>
@@ -148,11 +148,10 @@ function DemoEditor() {
       </section>
 
       <section className="admin-card">
-        <header><span>03</span><div><h2>Ajustes individuales</h2><p>Cambia una pieza sin perder el resto del preset.</p></div></header>
+        <header><span>03</span><div><h2>Ajustes individuales</h2><p>Cambia color, tipografía o imágenes sin perder el resto del preset.</p></div></header>
         <div className="admin-choice-section"><h3>Pack de color</h3><div className="choice-grid colors">{config.colorPacks.map((pack) => <button className={appearance.colorPackId === pack.id ? 'selected' : ''} type="button" key={pack.id} onClick={() => updateAppearance((draft) => { draft.colorPackId = pack.id; })}><span><i style={{ background: pack.tokens.background }} /><i style={{ background: pack.tokens.primary }} /><i style={{ background: pack.tokens.accent }} /></span><b>{pack.label}</b><small>{pack.description}</small>{appearance.colorPackId === pack.id && <Check />}</button>)}</div></div>
         <div className="admin-choice-section"><h3>Pack de fuentes</h3><div className="choice-grid">{config.fontPacks.map((pack) => <button className={appearance.fontPackId === pack.id ? 'selected' : ''} type="button" key={pack.id} onClick={() => updateAppearance((draft) => { draft.fontPackId = pack.id; })}><span className="font-sample" style={{ fontFamily: pack.heading }}>Aa</span><b>{pack.label}</b><small>{pack.description}</small>{appearance.fontPackId === pack.id && <Check />}</button>)}</div></div>
         <div className="admin-choice-section"><h3>Pack de imágenes</h3><div className="choice-grid images">{config.imagePacks.map((pack) => <button className={appearance.imagePackId === pack.id ? 'selected' : ''} type="button" key={pack.id} onClick={() => updateAppearance((draft) => { draft.imagePackId = pack.id; })}><img src={pack.hero} alt="" /><b>{pack.label}</b><small>{pack.description}</small>{appearance.imagePackId === pack.id && <Check />}</button>)}</div></div>
-        <div className="admin-choice-section"><h3>Hero</h3><div className="choice-grid">{config.heroVariants.map((variant) => <button className={appearance.heroVariantId === variant.id ? 'selected' : ''} type="button" key={variant.id} onClick={() => updateAppearance((draft) => { draft.heroVariantId = variant.id; })}><span className={`hero-mini ${variant.layout}`}><i /><b /></span><strong>{variant.label}</strong><small>{variant.description}</small>{appearance.heroVariantId === variant.id && <Check />}</button>)}</div></div>
       </section>
 
       <section className="admin-card compact-card">
