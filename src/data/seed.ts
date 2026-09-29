@@ -39,7 +39,7 @@ function barberiaSeed(): DemoData {
   return {
     version: 3,
     business: {
-      phone: '+34 931 234 567', whatsapp: '34612345678', email: 'hola@mwbarbershop.es',
+      phone: '+34 603 97 69 85', whatsapp: '+34 603 97 69 85', email: 'hola@mwbarbershop.es',
       address: 'Carrer de la Indústria, 42 · Barcelona',
       description: 'Barbería contemporánea, trato cercano y técnica cuidada. Tu estilo, siempre a punto.',
       instagram: '@mwbarbershop', facebook: 'MW BarberShop',
@@ -60,11 +60,11 @@ function barberiaSeed(): DemoData {
       { id: 'block-bruno', type: 'block', staffId: 'bruno', startDate: tomorrow, endDate: tomorrow, startTime: '16:00', endTime: '17:30', reason: 'Formación interna' },
     ],
     appointments: [
-      { id: 'barber-apt-1', serviceId: 'cut', staffId: 'alex', date: today, time: '10:00', customerName: 'Carlos López', phone: '612 456 987', status: 'confirmed', source: 'web', createdAt: new Date().toISOString() },
-      { id: 'barber-apt-2', serviceId: 'beard', staffId: 'bruno', date: today, time: '11:00', customerName: 'Diego Martínez', phone: '623 987 111', status: 'pending', source: 'whatsapp', createdAt: new Date().toISOString() },
-      { id: 'barber-apt-3', serviceId: 'combo', staffId: 'alex', date: today, time: '12:00', customerName: 'Javier Ruiz', phone: '611 332 870', status: 'confirmed', source: 'phone', createdAt: new Date().toISOString() },
-      { id: 'barber-apt-4', serviceId: 'cut', staffId: 'bruno', date: today, time: '16:00', customerName: 'Andrés García', phone: '633 555 120', status: 'confirmed', source: 'web', createdAt: new Date().toISOString() },
-      { id: 'barber-apt-5', serviceId: 'fade', staffId: 'alex', date: tomorrow, time: '09:30', customerName: 'Marc Vidal', phone: '644 220 113', status: 'confirmed', source: 'web', createdAt: new Date().toISOString() },
+      { id: 'barber-apt-1', serviceId: 'cut', staffId: 'alex', date: today, time: '10:00', customerName: 'Carlos López', phone: '603 97 69 85', status: 'confirmed', source: 'web', createdAt: new Date().toISOString() },
+      { id: 'barber-apt-2', serviceId: 'beard', staffId: 'bruno', date: today, time: '11:00', customerName: 'Diego Martínez', phone: '603 97 69 85', status: 'pending', source: 'whatsapp', createdAt: new Date().toISOString() },
+      { id: 'barber-apt-3', serviceId: 'combo', staffId: 'alex', date: today, time: '12:00', customerName: 'Javier Ruiz', phone: '603 97 69 85', status: 'confirmed', source: 'phone', createdAt: new Date().toISOString() },
+      { id: 'barber-apt-4', serviceId: 'cut', staffId: 'bruno', date: today, time: '16:00', customerName: 'Andrés García', phone: '603 97 69 85', status: 'confirmed', source: 'web', createdAt: new Date().toISOString() },
+      { id: 'barber-apt-5', serviceId: 'fade', staffId: 'alex', date: tomorrow, time: '09:30', customerName: 'Marc Vidal', phone: '603 97 69 85', status: 'confirmed', source: 'web', createdAt: new Date().toISOString() },
     ],
     gallery: [
       { id: 'barber-gallery-1', title: 'Nuestro espacio', imageSlot: 0, active: true, order: 0 },
@@ -89,7 +89,7 @@ function bellezaSeed(): DemoData {
   return {
     version: 3,
     business: {
-      phone: '+34 932 765 410', whatsapp: '34634567890', email: 'hola@mwbeautystudio.es',
+      phone: '+34 603 97 69 85', whatsapp: '+34 603 97 69 85', email: 'hola@mwbeautystudio.es',
       address: 'Carrer de Provença, 118 · Barcelona',
       description: 'Tratamientos de belleza cuidados, resultados naturales y un espacio pensado para bajar el ritmo.',
       instagram: '@mwbeautystudio', facebook: 'MW Beauty Studio',
@@ -111,11 +111,11 @@ function bellezaSeed(): DemoData {
       { id: 'beauty-special', type: 'special_hours', startDate: tomorrow, endDate: tomorrow, startTime: '10:00', endTime: '18:00', reason: 'Horario especial de formación' },
     ],
     appointments: [
-      { id: 'beauty-apt-1', serviceId: 'brow-design', staffId: 'laura', date: today, time: '10:00', customerName: 'Marta López', phone: '612 112 987', status: 'confirmed', source: 'web', createdAt: new Date().toISOString() },
-      { id: 'beauty-apt-2', serviceId: 'manicure', staffId: 'sofia', date: today, time: '11:30', customerName: 'Carla Ruiz', phone: '623 222 111', status: 'pending', source: 'whatsapp', createdAt: new Date().toISOString() },
-      { id: 'beauty-apt-3', serviceId: 'lash-lift', staffId: 'laura', date: today, time: '13:00', customerName: 'Elena García', phone: '611 333 870', status: 'confirmed', source: 'phone', createdAt: new Date().toISOString() },
-      { id: 'beauty-apt-4', serviceId: 'pedicure', staffId: 'sofia', date: today, time: '17:00', customerName: 'Lucía Martín', phone: '633 444 120', status: 'confirmed', source: 'web', createdAt: new Date().toISOString() },
-      { id: 'beauty-apt-5', serviceId: 'brow-wax', staffId: 'laura', date: tomorrow, time: '10:30', customerName: 'Ana Torres', phone: '644 550 113', status: 'confirmed', source: 'web', createdAt: new Date().toISOString() },
+      { id: 'beauty-apt-1', serviceId: 'brow-design', staffId: 'laura', date: today, time: '10:00', customerName: 'Marta López', phone: '+603 97 69 85', status: 'confirmed', source: 'web', createdAt: new Date().toISOString() },
+      { id: 'beauty-apt-2', serviceId: 'manicure', staffId: 'sofia', date: today, time: '11:30', customerName: 'Carla Ruiz', phone: '+603 97 69 85', status: 'pending', source: 'whatsapp', createdAt: new Date().toISOString() },
+      { id: 'beauty-apt-3', serviceId: 'lash-lift', staffId: 'laura', date: today, time: '13:00', customerName: 'Elena García', phone: '+603 97 69 85', status: 'confirmed', source: 'phone', createdAt: new Date().toISOString() },
+      { id: 'beauty-apt-4', serviceId: 'pedicure', staffId: 'sofia', date: today, time: '17:00', customerName: 'Lucía Martín', phone: '+603 97 69 85', status: 'confirmed', source: 'web', createdAt: new Date().toISOString() },
+      { id: 'beauty-apt-5', serviceId: 'brow-wax', staffId: 'laura', date: tomorrow, time: '10:30', customerName: 'Ana Torres', phone: '+603 97 69 85', status: 'confirmed', source: 'web', createdAt: new Date().toISOString() },
     ],
     gallery: [
       { id: 'beauty-gallery-1', title: 'Nuestro estudio', imageSlot: 0, active: true, order: 0 },
